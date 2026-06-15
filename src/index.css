@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Caveat:wght@700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-display: "Outfit", sans-serif;
+  --font-bebas: "Bebas Neue", sans-serif;
+  --font-handwriting: "Caveat", cursive;
+
+  --color-brand-primary: #8E1F0D;
+  --color-brand-secondary: #C64A19;
+  --color-brand-bg: #FFF2E5;
+  --color-brand-accent: #FFECDA;
+}

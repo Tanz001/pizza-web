@@ -1,0 +1,6 @@
+{
+  "name": "Bella Roma Pizza Landing Page",
+  "description": "A premium, award-winning interactive pizza restaurant landing page with high-performance GSAP animations and immersive particle effects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
