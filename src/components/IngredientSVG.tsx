@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface IngredientSVGProps {
-  type: 'basil' | 'tomato' | 'olive' | 'jalapeno' | 'mushroom' | 'onion';
+  type: 'basil' | 'tomato' | 'olive' | 'jalapeno' | 'mushroom' | 'onion' | 'parsley' | 'chili' | 'pepper-red';
   className?: string;
   style?: React.CSSProperties;
 }
@@ -366,6 +366,85 @@ export const IngredientSVG: React.FC<IngredientSVGProps> = ({ type, className = 
             fill="none"
             opacity="0.3"
           />
+        </svg>
+      );
+
+    case 'parsley':
+      return (
+        <svg
+          viewBox="0 0 100 100"
+          className={className}
+          style={style}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="parsleyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4ADE80" />
+              <stop offset="60%" stopColor="#16A34A" />
+              <stop offset="100%" stopColor="#14532D" />
+            </linearGradient>
+            <linearGradient id="parsleyVein" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#86EFAC" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#16A34A" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <path d="M 50 90 Q 48 70 50 50" stroke="#15803D" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+          <path d="M 50 50 C 45 40 40 30 50 15 C 60 30 55 40 50 50" fill="url(#parsleyGrad)" />
+          <path d="M 50 50 C 35 45 25 40 18 52 C 28 60 38 55 50 50" fill="url(#parsleyGrad)" />
+          <path d="M 50 50 C 65 45 75 40 82 52 C 72 60 62 55 50 50" fill="url(#parsleyGrad)" />
+          <path d="M 50 50 Q 45 35 50 20" stroke="url(#parsleyVein)" strokeWidth="1.2" fill="none" opacity="0.6" />
+          <path d="M 50 50 Q 38 48 24 50" stroke="url(#parsleyVein)" strokeWidth="1.2" fill="none" opacity="0.6" />
+          <path d="M 50 50 Q 62 48 76 50" stroke="url(#parsleyVein)" strokeWidth="1.2" fill="none" opacity="0.6" />
+        </svg>
+      );
+
+    case 'chili':
+      return (
+        <svg
+          viewBox="0 0 100 100"
+          className={className}
+          style={style}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="chiliGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#EF4444" />
+              <stop offset="70%" stopColor="#DC2626" />
+              <stop offset="100%" stopColor="#991B1B" />
+            </linearGradient>
+          </defs>
+          <path d="M 40 15 Q 45 22 48 28" stroke="#16A34A" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+          <path d="M 48 28 C 65 35 62 65 48 85 C 42 75 35 55 42 38 C 44 32 46 29 48 28 Z" fill="url(#chiliGrad)" />
+          <path d="M 52 36 C 56 46 54 56 50 66" stroke="#FFF" strokeWidth="2.2" strokeLinecap="round" fill="none" opacity="0.45" />
+        </svg>
+      );
+
+    case 'pepper-red':
+      return (
+        <svg
+          viewBox="0 0 120 120"
+          className={className}
+          style={style}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <radialGradient id="pepperOuter" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#EF4444" />
+              <stop offset="85%" stopColor="#DC2626" />
+              <stop offset="100%" stopColor="#991B1B" />
+            </radialGradient>
+            <linearGradient id="pepperStem" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#4ADE80" />
+              <stop offset="100%" stopColor="#16A34A" />
+            </linearGradient>
+          </defs>
+          <path d="M 60 12 L 60 28" stroke="url(#pepperStem)" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M 52 28 Q 60 30 68 28" stroke="url(#pepperStem)" strokeWidth="4" fill="none" />
+          <path d="M 60 28 C 45 24 22 28 20 48 C 18 68 28 88 42 98 C 52 102 68 102 78 98 C 92 88 102 68 100 48 C 98 28 75 24 60 28 Z" fill="url(#pepperOuter)" />
+          <path d="M 60 28 Q 50 60 60 99" stroke="#7F1D1D" strokeWidth="3.2" fill="none" opacity="0.25" />
+          <path d="M 20 48 Q 50 65 100 48" stroke="#7F1D1D" strokeWidth="2.5" fill="none" opacity="0.25" />
+          <path d="M 32 40 C 26 50 28 70 38 80" stroke="#FFF" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.35" />
+          <path d="M 88 40 C 94 50 92 70 82 80" stroke="#FFF" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.25" />
         </svg>
       );
 

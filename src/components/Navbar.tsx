@@ -46,12 +46,12 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount }) => {
               <span className={`font-bebas text-xl sm:text-2xl tracking-[0.08em] leading-none transition-colors duration-500 ${
                 isScrolled ? 'text-[#380902]' : 'text-white'
               }`}>
-                BELLA ROMA
+                PIZZA CRAVE
               </span>
               <span className={`font-sans font-black text-[8px] sm:text-[9px] tracking-widest uppercase transition-colors duration-500 ${
                 isScrolled ? 'text-[#8E1F0D]/75' : 'text-[#FFBC00]'
               }`}>
-                DAL 1984 RISTORANTE
+                Gourmet Neapolitan
               </span>
             </div>
           </div>
@@ -119,14 +119,14 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount }) => {
               <span>DIAL IN NOW</span>
             </a>
 
-            {/* Roma Tag */}
+            {/* Rome Tag */}
             <div className={`hidden sm:flex items-center gap-1.5 py-1.5 px-3.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${
               isScrolled
                 ? 'bg-stone-100/80 border-stone-200/50 text-stone-600'
                 : 'bg-white/5 border-white/5 text-[#FFECDA]'
             }`}>
               <MapPin size={11} className={isScrolled ? 'text-[#8E1F0D]' : 'text-[#FFBC00]'} />
-              <span>ROMA, IT</span>
+              <span>ROME, IT</span>
             </div>
 
             {/* Shopping Cart Button */}

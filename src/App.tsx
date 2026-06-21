@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import Lenis from 'lenis';
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,19 +22,26 @@ import { PIZZAS } from './data';
 import { FloatingIngredientInstance } from './types';
 import { Navbar } from './components/Navbar';
 import { IngredientSVG } from './components/IngredientSVG';
+import { CustomCursor } from './components/CustomCursor';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
-// Direct high-quality transparent PNG images of real ingredients
+// Direct high-quality transparent PNG images of real ingredients (stored in public folder)
 const REAL_INGREDIENT_IMAGES: Record<string, string> = {
-  basil: 'https://pngimg.com/uploads/basil/basil_PNG12.png',
-  tomato: 'https://pngimg.com/uploads/tomato/tomato_PNG1259.png',
-  olive: 'https://pngimg.com/uploads/olive/olive_PNG19.png',
-  jalapeno: 'https://pngimg.com/uploads/pepper/pepper_PNG13.png',
-  mushroom: 'https://pngimg.com/uploads/mushroom/mushroom_PNG3193.png',
-  onion: 'https://pngimg.com/uploads/onion/onion_PNG3821.png',
+  basil: '/ingredients/basil.png',
+  tomato: '/ingredients/tomato.png',
+  olive: '/ingredients/olive.png',
+  jalapeno: '/ingredients/jalapeno.png',
+  mushroom: '/ingredients/mushroom.png',
+  onion: '/ingredients/onion.png',
 };
+
+const PARSLEY_SPRIG_IMAGE = '/ingredients/parsley-sprig.png';
+const PARSLEY_LEAF_IMAGE = '/ingredients/parsley-leaf.png';
+const CHILI_IMAGE = '/ingredients/chili.png';
+const PEPPER_RED_IMAGE = '/ingredients/pepper-red.png';
+const PARLOR_TOMATO_IMAGE = '/ingredients/tomato.png';
 
 interface MenuItemType {
   id: string;
@@ -164,43 +172,43 @@ interface CraftCategoryStory {
 
 const CATEGORIES_STORY_DATA: Record<string, CraftCategoryStory> = {
   pizza: {
-    title: "IL NEAPOLITANO CLASSICO",
-    badge: "LA PASSIONE DELLA FARINA",
+    title: "THE CLASSIC NEAPOLITAN",
+    badge: "THE PASSION FOR FLOUR",
     story: "Our legendary sourdough sits in temperature-controlled fermentation chambers for full 48 hours to activate native wild lactobacilli. Hand-stretched to retain perfect micro-bubbles, then baked in hand-built dome brick ovens. When the heat hits 485°C, moisture turns to steam instantaneously, puffing up the crust into a blistered 'cornicione' and cooking the sweet tomato toppings in under 90 seconds.",
     details: ["48-Hour Cold Sourdough Cure", "90-Second Extreme Thermal Bake", "100% Certified San Marzano Tomato"],
     imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80"
   },
   burgers: {
     title: "PRIME CHIANINA SELECTION",
-    badge: "MACELLERIA GOURMET",
+    badge: "GOURMET BUTCHERY",
     story: "We grind absolute choice cuts of wet-aged Italian Chianina beef daily, seasoning merely with crushed Mediterranean rock salt and black peppercorn. Grilled over natural lump charcoal, layered under soft brioche bun halves, and glazed in thick organic truffle paste and melted vintage Scamorza cheese.",
     details: ["Premium Chianina Beef Choice", "Aged Smoked Scamorza Core", "Black Summer Truffle Glaze"],
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80"
   },
   salad: {
-    title: "IL GIARDINO FRESCO",
-    badge: "VERDURE DI STAGIONE",
+    title: "THE FRESH GARDEN",
+    badge: "SEASONAL VEGETABLES",
     story: "Seasonal organic harvest celebrating volcanic-rich soils. We pluck young rocket crisp, tossing gently under aged Modena balsamic vinegar reduction and cold-pressed extra virgin culinary oils. Crowned proudly with a full creamy Burrata sphere displaying a sweet milk core.",
     details: ["Soil-certified Rocket Leaves", "Aged Modena Balsamic Dressing", "Whole Fresh Creamy Burrata"],
     imageUrl: "https://images.unsplash.com/photo-1623428187969-5da2d87f0bc1?w=800&auto=format&fit=crop&q=80"
   },
   fries: {
-    title: "TARTUFO CROCCANTE",
-    badge: "PATATE DORATE",
+    title: "CRISPY TRUFFLE",
+    badge: "GOLDEN POTATOES",
     story: "Finest local yellow-flesh Yukon potatoes are sliced thick, skin kept on, double-cooked for an incredibly crisp exterior and fluffy center. Dusted by fine garden rosemary leaves, whole garlic cloves, and heapings of shaved Parmigiano-Reggiano of raw-milk heritage.",
     details: ["Authentic Double-frying Method", "Mountain Rosemary-Infused Salt", "Parmigiano-Reggiano Cheese Dust"],
     imageUrl: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800&auto=format&fit=crop&q=80"
   },
   drinks: {
-    title: "BIBITE E BIRRE PREGIATE",
-    badge: "FRESCHEZZA LIQUIDA",
+    title: "FINE DRINKS AND BEERS",
+    badge: "LIQUID FRESHNESS",
     story: "Refreshing beverages to complement rich Italian cheese fats. Traditional sparkling mineral waters infused with true cold-pressed juices of Sicilian blood orange, or classic pale Roman lagers made from micro-harvested island maize for a clean finish.",
     details: ["Sicilian Blood Orange Juice", "Nastro Azzurro Pale Lager", "Zero Artificial Flavoring"],
     imageUrl: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&auto=format&fit=crop&q=80"
   },
   chicken: {
-    title: "POLLO ALLA TUSCANA",
-    badge: "POLLERIA ARTIGIANALE",
+    title: "TUSCAN CHICKEN",
+    badge: "ARTISANAL POULTRY",
     story: "Organic breast and drum fillets bathed slow in fresh rosemary buttermilk, crusted inside double-sifted durum wheat semolina, fried crispy, and finished off with Calabrian spicy chili glaze and warm wild forest honey splashes.",
     details: ["Durum Wheat Semolina Crust", "Buttermilk Rosemary Marinade", "Calabrian Pepper & Wildflower Honey"],
     imageUrl: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=800&auto=format&fit=crop&q=80"
@@ -259,6 +267,29 @@ export default function App() {
   const ingredientsRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const currentPizza = PIZZAS[activeIndex];
+
+  // Initialize Lenis smooth scroll and hook it to GSAP ScrollTrigger
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    const rafHandler = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    gsap.ticker.add(rafHandler);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(rafHandler);
+    };
+  }, []);
 
   // 1. Core Page Entry animations
   useGSAP(() => {
@@ -332,7 +363,7 @@ export default function App() {
     // As user scrolls, elements translate elegantly out of bounds
     const scrollTl = gsap.timeline({
       scrollTrigger: {
-        trigger: mainContainerRef.current,
+        trigger: '#hero-section',
         start: 'top top',
         end: 'bottom top',
         scrub: 1, // Smooth dragging action
@@ -365,31 +396,30 @@ export default function App() {
       }
     });
 
-    // 5. Scroll Trigger Brand Section animations
+    // 5. Scroll Trigger Brand Section animations (play once on scroll entry)
     const parlorScrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: '#about-parlor-section',
-        start: 'top 95%',
-        end: 'bottom 45%',
-        scrub: 1.2,
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+        once: true,
       }
     });
 
     // Pizza rolls in from far left
     parlorScrollTl.fromTo('.scroll-parlor-pizza',
-      { x: -300, rotation: -120, opacity: 0 },
-      { x: 0, rotation: 0, opacity: 1, ease: 'sine.out' }
+      { x: -150, rotation: -60, opacity: 0 },
+      { x: 0, rotation: 0, opacity: 1, duration: 1.2, ease: 'power3.out' }
     );
 
-    // Heading slides in from right side to its exact position on the right (perfect symmetric alignment)
+    // Heading slides in from right side
     parlorScrollTl.fromTo('.scroll-parlor-heading',
-      { x: 300, opacity: 0 },
-      { x: 0, opacity: 1, ease: 'sine.out' },
-      '<0.15'
+      { x: 150, opacity: 0 },
+      { x: 0, opacity: 1, duration: 1.2, ease: 'power3.out' },
+      '-=0.9'
     );
 
-    // Parallax animate the Tomato sticking out from right:
-    // when we scroll down, the tomato moves UP; when we scroll up, it moves DOWN
+    // Parallax animate the Tomato sticking out from right
     gsap.fromTo('.scroll-parlor-tomato',
       { y: 150 },
       {
@@ -421,27 +451,27 @@ export default function App() {
       }
     );
 
-    // Scroll Trigger Popular Pizza Section animations
+    // Scroll Trigger Popular Pizza Section animations (play once on scroll entry)
     const signatureScrollTl = gsap.timeline({
       scrollTrigger: {
         trigger: '#signature-pizza-section',
-        start: 'top 90%',
-        end: 'bottom 40%',
-        scrub: 1,
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+        once: true,
       }
     });
 
     // Elegant text slide in
     signatureScrollTl.fromTo('.scroll-signature-header',
-      { y: 60, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.8, ease: 'sine.out' }
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
     );
 
     // Stagger slide entry for the beautiful cards
     signatureScrollTl.fromTo('.scroll-signature-card',
-      { y: 120, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 1.2, ease: 'back.out(1.1)', stagger: 0.12 },
-      '-=0.3'
+      { y: 80, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 1.0, ease: 'power3.out', stagger: 0.15 },
+      '-=0.4'
     );
 
     // Continuous floating ambient loop for signature colored dots
@@ -459,6 +489,81 @@ export default function App() {
           from: 'random'
         }
       }
+    );
+
+    // Scroll Trigger All Flavors Section animations (play once on scroll entry)
+    const flavorsScrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#all-flavors-section',
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+        once: true,
+      }
+    });
+
+    flavorsScrollTl.fromTo('.scroll-flavors-header',
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    );
+
+    flavorsScrollTl.fromTo('.scroll-flavors-card',
+      { y: 80, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 1.0, ease: 'power3.out', stagger: 0.15 },
+      '-=0.4'
+    );
+
+    // Scroll Trigger Why Choose Us Section animations (play once on scroll entry)
+    const whyScrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#why-choose-us',
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+        once: true,
+      }
+    });
+
+    whyScrollTl.fromTo('.scroll-why-header',
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    );
+
+    whyScrollTl.fromTo('.scroll-why-item',
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', stagger: 0.1 },
+      '-=0.5'
+    );
+
+    whyScrollTl.fromTo('.scroll-why-tomato',
+      { scale: 0.8, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 1, ease: 'back.out(1.2)' },
+      '-=0.6'
+    );
+
+    // Scroll Trigger Testimonials Section animations (play once on scroll entry)
+    const testScrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#testimonials-section',
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+        once: true,
+      }
+    });
+
+    testScrollTl.fromTo('.scroll-test-left',
+      { x: -50, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
+    );
+
+    testScrollTl.fromTo('.scroll-test-center',
+      { scale: 0.8, opacity: 0, rotation: -10 },
+      { scale: 1, opacity: 1, rotation: 0, duration: 1.0, ease: 'back.out(1.2)' },
+      '-=0.6'
+    );
+
+    testScrollTl.fromTo('.scroll-test-right',
+      { x: 50, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
+      '-=0.8'
     );
 
     // Clean up ScrollTrigger events
@@ -734,6 +839,9 @@ export default function App() {
       {/* Elegant grid background pattern subtle */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none z-0 opacity-40" />
 
+      {/* Premium Custom Cursor */}
+      <CustomCursor />
+
       {/* Premium Navbar */}
       <Navbar cartCount={cartCount} />
 
@@ -785,7 +893,7 @@ export default function App() {
                     alt={ing.type}
                     className="w-full h-full object-contain transform hover:scale-115 transition-transform duration-300 pointer-events-none select-none"
                     style={{
-                      filter: 'drop-shadow(0 6px 12px rgba(50,10,0,0.1))',
+                      filter: `drop-shadow(0 ${6 * ing.scale}px ${12 * ing.scale}px rgba(50, 10, 0, ${0.15 * ing.scale}))`,
                     }}
                   />
                 </div>
@@ -822,12 +930,12 @@ export default function App() {
                 {isAddingToCart ? (
                   <>
                     <Sparkles size={14} className="animate-spin text-stone-900" />
-                    <span className="text-stone-900">PREPARANDO...</span>
+                    <span className="text-stone-900">PREPARING...</span>
                   </>
                 ) : (
                   <>
                     <ShoppingBag size={14} className="group-hover:scale-110 transition-transform duration-300 text-[#380902]" />
-                    <span className="text-[#380902]">AGGIUNGI AL CARRELLO</span>
+                    <span className="text-[#380902]">ADD TO CART</span>
                   </>
                 )}
               </div>
@@ -908,21 +1016,21 @@ export default function App() {
 
         {/* Scattered Real Parsleys and Chilis on curve boundaries */}
         <div className="absolute top-[-75px] left-[15%] w-10 sm:w-16 h-auto pointer-events-none select-none z-30 opacity-90 rotate-[15deg] transition-all">
-          <img src="https://pngimg.com/uploads/parsley/parsley_PNG13.png" alt="Parsley Sprig" className="w-full object-contain" />
+          <img src={PARSLEY_SPRIG_IMAGE} alt="Parsley Sprig" className="w-full object-contain" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }} />
         </div>
         <div className="absolute top-[-45px] left-[32%] w-6 sm:w-10 h-auto pointer-events-none select-none z-30 opacity-95 rotate-[-45deg]">
-          <img src="https://pngimg.com/uploads/chili/chili_PNG3.png" alt="Chili Flake" className="w-full object-contain" />
+          <img src={CHILI_IMAGE} alt="Chili Flake" className="w-full object-contain" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }} />
         </div>
         <div className="absolute top-[-65px] right-[25%] w-10 sm:w-14 h-auto pointer-events-none select-none z-30 opacity-90 rotate-[110deg]">
-          <img src="https://pngimg.com/uploads/parsley/parsley_PNG16.png" alt="Parsley Leaf" className="w-full object-contain" />
+          <img src={PARSLEY_LEAF_IMAGE} alt="Parsley Leaf" className="w-full object-contain" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }} />
         </div>
         <div className="absolute top-[-90px] right-[40%] w-7 sm:w-11 h-auto pointer-events-none select-none z-30 opacity-95 rotate-[35deg]">
-          <img src="https://pngimg.com/uploads/chili/chili_PNG3.png" alt="Chili piece" className="w-full object-contain" />
+          <img src={CHILI_IMAGE} alt="Chili piece" className="w-full object-contain" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.12))' }} />
         </div>
 
         {/* Realistic left red bell pepper hanging off margin */}
         <div className="absolute left-[-25px] sm:left-[-45px] md:left-[-65px] top-[140px] w-24 sm:w-36 md:w-44 lg:w-56 h-auto pointer-events-none select-none z-20 rotate-[-12deg] hover:rotate-[-4deg] transition-transform duration-1000 ease-out" style={{ filter: 'drop-shadow(0 25px 45px rgba(100,10,0,0.14))' }}>
-          <img src="https://pngimg.com/uploads/pepper/pepper_PNG13.png" alt="Fresh Bell Pepper" className="w-full object-contain" />
+          <img src={PEPPER_RED_IMAGE} alt="Fresh Bell Pepper" className="w-full object-contain" />
         </div>
 
         {/* Floating circular visual custom ORDER NOW Badge right in the center slot */}
@@ -1073,6 +1181,7 @@ export default function App() {
                     <h3 className="font-serif text-3xl sm:text-4xl font-extrabold italic text-brand-primary mb-4 leading-tight">
                       {currentStory.title}
                     </h3>
+                    <p className="font-sans text-xs sm:text-sm text-stone-400 mb-2">Via Appia Antica 15<br />Rome, 00118 IT</p>
                     <p className="font-sans text-xs sm:text-sm text-brand-primary/75 leading-relaxed mb-6">
                       {currentStory.story}
                     </p>
@@ -1163,9 +1272,10 @@ export default function App() {
           }}
         >
           <img
-            src="https://pngimg.com/uploads/tomato/tomato_PNG1259.png"
+            src={PARLOR_TOMATO_IMAGE}
             alt="Organic Parallax Tomato"
             className="w-full object-contain"
+            style={{ filter: 'drop-shadow(0 25px 45px rgba(250,50,10,0.25))' }}
           />
         </div>
 
@@ -1506,164 +1616,144 @@ export default function App() {
         </div>
       </section>
 
-      {/* WHY CHOOSE US & WE ARE KNOWN SECTION - BEAUTIFUL CLEAN MINIMAL GRID */}
+      {/* ALL FLAVORS / FULL ARTISANAL MENU SECTION */}
       <section
-        id="why-choose-us"
-        className="relative w-full py-24 sm:py-32 bg-white text-stone-900 border-t border-stone-100"
+        id="all-flavors-section"
+        className="relative w-full py-24 sm:py-32 bg-[#FAF6F2] text-stone-900 border-t border-b border-stone-150/50 overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-6 relative">
+        {/* Floating background decorative details */}
+        <div className="absolute inset-0 pointer-events-none z-0 select-none">
+          <div className="absolute top-[10%] right-[5%] w-[35vw] h-[35vw] rounded-full bg-amber-400/5 blur-[90px]" />
+          <div className="absolute bottom-[10%] left-[5%] w-[35vw] h-[35vw] rounded-full bg-orange-500/5 blur-[90px]" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-            
-            {/* Left Column: The Feature Grid */}
-            <div className="lg:col-span-8 flex flex-col">
-              
-              {/* Elegant Section Header */}
-              <div className="flex items-center gap-6 md:gap-8 mb-12 select-none">
-                <span className="font-sans text-xs sm:text-sm tracking-[0.25em] font-black text-[#C64A19] uppercase shrink-0 leading-none">
-                  WHY CHOOSE US?
-                </span>
-                <div className="w-[1px] h-10 bg-neutral-200 shrink-0" />
-                <h2 className="font-bebas text-4xl sm:text-5xl md:text-6xl tracking-tight leading-none text-stone-900 uppercase">
-                  WE ARE KNOWN
-                </h2>
-              </div>
+          {/* Elegant header */}
+          <div className="scroll-flavors-header text-center mb-16 sm:mb-20 flex flex-col items-center">
+            <span className="font-sans text-xs sm:text-sm tracking-[0.25em] font-black text-[#C64A19] uppercase mb-3 leading-none">
+              OUR COMPLETE MENU
+            </span>
+            <h2 className="font-bebas text-4xl sm:text-6xl tracking-tight leading-none text-stone-900 uppercase">
+              ARTISANAL PIZZA FLAVORS
+            </h2>
+            <div className="w-16 h-[2px] bg-[#C64A19] mt-6 rounded" />
+          </div>
 
-              {/* 3x2 Grid Container with detailed dividers */}
-              <div className="grid grid-cols-1 md:grid-cols-2 border-t border-b border-neutral-150 md:divide-x divide-neutral-150 divide-y md:divide-y-0">
-                
-                {/* Column 1 */}
-                <div className="flex flex-col divide-y divide-neutral-150">
-                  {/* Item 1 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M12 21c-4.418 0-8-3.134-8-7s3.582-7 8-7 8 3.134 8 7-3.582 7-8 7z" />
-                        <path d="M12 7c.5-1.5 2-2.5 3-2M12 7c-.5-1.5-2-2.5-3-2M12 7V4M12 4c.5-1 2-1 2-1M12 4c-.5-1-2-1-2-1" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">ALWAYS SERVE FRESH FOOD</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Perfectly portioned ingredients.</p>
-                    </div>
-                  </div>
-
-                  {/* Item 2 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M6 18c0-1.5 1-3.5 3-4C7 11.5 7.5 7 12 7c4.5 0 5 4.5 3 7 2 .5 3 2.5 3 4M5 18h14M6 21h12" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">WE HAVE POPULAR MASTERCHEF</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">The patient staff reflects the style.</p>
-                    </div>
-                  </div>
-
-                  {/* Item 3 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M20.5 4.5C20.5 4.5 12 6 8 10c-4 4-4.5 11.5-4.5 11.5s7.5-.5 11.5-4.5c4-4 5.5-12.5 5.5-12.5z" strokeLinecap="round" strokeLinejoin="round" />
-                        <circle cx="11" cy="11" r="1.5" fill="currentColor" />
-                        <circle cx="15" cy="8" r="1" fill="currentColor" />
-                        <circle cx="8" cy="15" r="1.5" fill="currentColor" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">DELICIOUS PIZZA RECIPES</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Best crust with this good recipe.</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Column 2 */}
-                <div className="flex flex-col divide-y divide-neutral-150">
-                  {/* Item 4 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">MAINTAINING THE QUALITY OF FOOD</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Standardized food recipes for uniform taste.</p>
-                    </div>
-                  </div>
-
-                  {/* Item 5 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M9 18V5l12-2v13M9 10l12-2" strokeLinecap="round" strokeLinejoin="round" />
-                        <circle cx="6" cy="18" r="3" />
-                        <circle cx="18" cy="16" r="3" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">BEST LIVE MUSIC RESTAURANTS</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Beautiful natural & serene ambience.</p>
-                    </div>
-                  </div>
-
-                  {/* Item 6 */}
-                  <div className="flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
-                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
-                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                        <path d="M21 16c0-4.418-4.03-8-9-8s-9 3.582-9 8h18zM12 4M12 4v4M10 4h4" strokeLinecap="round" />
-                        <path d="M2 19h20c0 1.105-.895 2-2 2H4c-1.105 0-2-.895-2-2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">WONDERFUL DINING EXPERIENCE</h3>
-                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">A memorable dining atmosphere.</p>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Right Column: Floating Fresh ripe tomato visual side element with Scroll Bar as in image */}
-            <div className="lg:col-span-4 flex flex-row items-stretch justify-center relative min-h-[400px] select-none pl-4 overflow-visible">
-              
-              <div className="flex-1 flex flex-col items-center justify-center py-8 relative">
-                {/* Ripe tomato transparent image illustration float effect */}
-                <motion.div
-                  animate={{ y: [0, -12, 0], rotate: [0, 4, -2, 0] }}
-                  transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
-                  className="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center"
-                >
+          {/* Grid layout containing 2 columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
+            {PIZZAS.map((pizza) => (
+              <div
+                key={pizza.id}
+                className="scroll-flavors-card p-6 pb-8 pt-20 transition-all duration-500 hover:-translate-y-3 flex flex-col relative group overflow-visible"
+              >
+                {/* 1. OVERLAPPING FLOATING PIZZA IMAGE */}
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32 lg:w-36 lg:h-36 z-20">
+                  {/* Cast shadow */}
+                  <div className="absolute inset-1.5 bg-black/16 blur-md rounded-full -bottom-1.5 group-hover:bg-amber-900/20 group-hover:blur-lg transition-all duration-500" />
+                  
+                  {/* Main image */}
                   <img
-                    src="https://pngimg.com/uploads/tomato/tomato_PNG1259.png"
-                    alt="Glossy Italian Tomato"
-                    className="w-full h-full object-contain filter drop-shadow-[0_25px_45px_rgba(142,31,13,0.3)]"
+                    src={pizza.imageUrl}
+                    alt={pizza.displayName}
+                    className="w-full h-full object-cover rounded-full select-none pointer-events-none transition-all duration-700 ease-out group-hover:scale-108 group-hover:rotate-[20deg] shadow-[0_10px_20px_rgba(0,0,0,0.16)] ring-4 ring-white relative z-10"
+                    style={{ clipPath: 'circle(50% at 50% 50%)' }}
                   />
-                  {/* Absolute small helper labels around card */}
-                  <span className="absolute top-1/2 -left-6 tracking-[0.2em] text-[10px] font-mono text-stone-400 transform -rotate-90 uppercase">
-                    100% Organico
-                  </span>
-                  <span className="absolute bottom-6 right-6 tracking-[0.2em] text-[10px] font-mono text-stone-400 uppercase">
-                    Fatto A Mano
-                  </span>
-                </motion.div>
-              </div>
-
-              {/* Vertical line with vertical "SCROLL" and branding tag just like the image 2 right columns */}
-              <div className="w-16 flex flex-col items-center justify-between border-l border-neutral-100 py-6 scale-95 shrink-0 select-none">
-                <span className="font-sans text-[10px] font-black tracking-[0.3em] uppercase text-stone-400 rotate-90 my-12 whitespace-nowrap">
-                  SCROLL DOWN
-                </span>
-                <div className="w-[1.5px] h-24 bg-neutral-200" />
-                <div className="bg-[#380902] text-white py-4 px-2 tracking-[0.2em] font-sans font-black text-[9px] uppercase [writing-mode:vertical-rl] rounded-sm transform rotate-180 shadow-md">
-                  BELLA ROMA ORIGINALS
                 </div>
+
+                {/* 2. BRANDING BADGE & DISPLAY NAME */}
+                <div className="text-center mt-6 mb-4 flex flex-col items-center">
+                  <span
+                    className="font-sans text-[9px] tracking-[0.2em] font-black uppercase px-2.5 py-1 rounded-full mb-3 shadow-[0_3px_8px_rgba(0,0,0,0.02)] text-white"
+                    style={{ backgroundColor: pizza.accentColor }}
+                  >
+                    {pizza.name}
+                  </span>
+                  <h3 className="font-serif italic text-2xl text-stone-900 tracking-tight leading-tight group-hover:text-[#C64A19] transition-colors duration-300">
+                    {pizza.displayName}
+                  </h3>
+                  <span className="font-sans text-[9px] font-bold tracking-widest uppercase text-stone-400 mt-1.5">
+                    {pizza.tagline}
+                  </span>
+                </div>
+
+                {/* 3. INGREDIENTS LIST WITH MINI REAL PHOTOS */}
+                <div className="mb-6 flex flex-col items-center">
+                  <span className="font-sans text-[8px] font-black tracking-widest text-stone-400 uppercase mb-2">
+                    INGREDIENTS ON PIZZA
+                  </span>
+                  <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                    {pizza.ingredients.map((ing) => {
+                      const assetName = ing === 'parsley' ? 'parsley-leaf' : ing;
+                      return (
+                        <div
+                          key={ing}
+                          className="group/ing relative flex items-center justify-center w-8 h-8 rounded-full border border-neutral-250/30 bg-white shadow-sm hover:scale-115 transition-transform duration-300"
+                        >
+                          <img
+                            src={`/ingredients/${assetName}.png`}
+                            alt={ing}
+                            className="w-6 h-6 object-contain pointer-events-none select-none"
+                          />
+                          {/* Hover tooltip */}
+                          <span className="absolute bottom-[108%] bg-[#380902] text-white font-sans font-bold text-[8px] tracking-wider uppercase px-2 py-0.5 rounded shadow-md opacity-0 pointer-events-none group-hover/ing:opacity-100 transition-opacity duration-300 whitespace-nowrap z-30">
+                            {ing}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 4. DESCRIPTION */}
+                <p className="text-xs text-stone-500 leading-relaxed text-center mb-6 line-clamp-3">
+                  {pizza.description}
+                </p>
+
+                {/* 5. SPECIFICATION INFO (Rating, prep, calories) */}
+                <div className="grid grid-cols-3 gap-2 border-t border-b border-stone-200/50 py-3.5 mb-6 text-center select-none">
+                  <div>
+                    <span className="block text-[8px] text-stone-400 font-extrabold uppercase tracking-wider mb-0.5">Rating</span>
+                    <span className="text-stone-800 font-black text-xs flex items-center justify-center gap-0.5">
+                      {pizza.rating} <span className="text-[#FFC724] fill-[#FFC724]">★</span>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-stone-400 font-extrabold uppercase tracking-wider mb-0.5">Prep</span>
+                    <span className="text-stone-800 font-black text-xs">{pizza.prepTime}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-stone-400 font-extrabold uppercase tracking-wider mb-0.5">Energy</span>
+                    <span className="text-stone-800 font-black text-xs">{pizza.calories} kcal</span>
+                  </div>
+                </div>
+
+                {/* 6. PRICE & ACTION BUTTON */}
+                <div className="flex items-center justify-between mt-auto pt-2">
+                  <div className="text-left">
+                    <span className="block text-[8px] uppercase tracking-wider font-extrabold text-stone-400 leading-none mb-0.5">PRICE</span>
+                    <span className="text-stone-900 font-black text-lg tracking-tight">
+                      ${pizza.price.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setCartCount(prev => prev + 1);
+                      setIsAddingToCart(true);
+                      setTimeout(() => setIsAddingToCart(false), 800);
+                    }}
+                    className="px-5 py-2.5 bg-[#B2492D] text-white hover:bg-stone-900 rounded-full font-sans font-bold text-xs tracking-wider uppercase transition-all duration-300 relative overflow-hidden flex items-center justify-center cursor-pointer shadow-md shadow-orange-700/10 hover:-translate-y-0.5 focus:outline-none"
+                    style={{
+                      boxShadow: `0 8px 20px rgba(178, 73, 45, 0.15)`,
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                </div>
+
               </div>
-
-            </div>
-
+            ))}
           </div>
 
         </div>
@@ -1698,10 +1788,10 @@ export default function App() {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-4 lg:gap-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-6 md:gap-4 lg:gap-8 xl:gap-12">
             
             {/* 1. LEFT COLUMN: Headings and custom arrow navigations (matching image layout) */}
-            <div className="w-full md:w-[26%] lg:w-[28%] flex flex-col items-center md:items-start text-center md:text-left shrink-0">
+            <div className="scroll-test-left w-full md:w-[24%] lg:w-[22%] flex flex-col items-center md:items-start text-center md:text-left">
               <span className="font-sans text-xs sm:text-sm tracking-[0.2em] font-black text-[#D44422] uppercase mb-3 sm:mb-4 leading-none inline-block">
                 {TESTIMONIALS[activeTestimonialIdx].tag}
               </span>
@@ -1737,22 +1827,63 @@ export default function App() {
             </div>
 
             {/* 2. MIDDLE COLUMN: Floating photographic Polaroid picture frames stacks with generous space */}
-            <div className="w-full md:w-[34%] lg:w-[38%] flex items-center justify-center relative min-h-[260px] sm:min-h-[300px] md:min-h-[300px] lg:min-h-[340px] xl:min-h-[380px] overflow-visible select-none py-4 md:py-6 shrink-0">
+            <div className="scroll-test-center w-full md:w-[34%] lg:w-[36%] flex items-center justify-center relative min-h-[300px] sm:min-h-[340px] md:min-h-[340px] lg:min-h-[380px] xl:min-h-[420px] overflow-visible select-none py-6">
               
-              {/* Backing Polaroid card (stacked/rotated slightly behind) */}
-              <div className={`absolute w-32 h-40 sm:w-36 sm:h-44 md:w-36 md:h-44 lg:w-44 lg:h-56 xl:w-52 xl:h-64 bg-[#FAF8F5] p-2 sm:p-3 border border-white/5 shadow-2xl rounded-sm transition-all duration-700 ease-out z-10 transform scale-95 opacity-35 ${TESTIMONIALS[activeTestimonialIdx].skewBack}`}>
-                <div className="w-full h-full overflow-hidden bg-stone-900">
+              {/* Back Card (Index: active + 2) */}
+              <div 
+                className="absolute w-36 h-46 sm:w-40 sm:h-52 md:w-40 md:h-48 lg:w-48 lg:h-60 xl:w-56 xl:h-72 bg-[#FAF8F5] p-2 sm:p-3 pb-8 sm:pb-10 border border-white/5 shadow-xl rounded-sm transition-all duration-700 ease-out pointer-events-none"
+                style={{
+                  zIndex: 10,
+                  transform: `scale(0.9) rotate(-8deg) translate(-28px, -15px)`,
+                  opacity: 0.45,
+                }}
+              >
+                <div className="w-full h-[80%] overflow-hidden bg-stone-900">
                   <img
-                    src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=85&w=600&auto=format&fit=crop"
-                    alt="Atmospheric Dish background"
-                    className="w-full h-full object-cover grayscale opacity-90 blur-[0.5px]"
+                    src={TESTIMONIALS[(activeTestimonialIdx + 2) % TESTIMONIALS.length].photoUrl}
+                    alt="Back testimonial photo"
+                    className="w-full h-full object-cover grayscale opacity-90 blur-[0.2px]"
                   />
+                </div>
+                <div className="w-full h-[20%] flex items-center justify-center mt-1">
+                  <span className="font-handwriting text-[#380902]/60 text-xl tracking-wide">
+                    {TESTIMONIALS[(activeTestimonialIdx + 2) % TESTIMONIALS.length].badge}
+                  </span>
                 </div>
               </div>
 
-              {/* Main Front Polaroid card */}
-              <div className={`absolute w-36 h-46 sm:w-40 sm:h-52 md:w-40 md:h-48 lg:w-48 lg:h-60 xl:w-56 xl:h-72 bg-white p-2 sm:p-3 pb-8 sm:pb-10 border border-white/10 shadow-[0_25px_55px_rgba(0,0,0,0.65)] rounded-sm transition-all duration-700 ease-out z-20 transform hover:scale-105 group ${TESTIMONIALS[activeTestimonialIdx].skewFront}`}>
-                
+              {/* Middle Card (Index: active + 1) */}
+              <div 
+                className="absolute w-36 h-46 sm:w-40 sm:h-52 md:w-40 md:h-48 lg:w-48 lg:h-60 xl:w-56 xl:h-72 bg-[#FCFAF7] p-2 sm:p-3 pb-8 sm:pb-10 border border-white/5 shadow-2xl rounded-sm transition-all duration-700 ease-out pointer-events-none"
+                style={{
+                  zIndex: 15,
+                  transform: `scale(0.95) rotate(6deg) translate(22px, -8px)`,
+                  opacity: 0.75,
+                }}
+              >
+                <div className="w-full h-[80%] overflow-hidden bg-stone-900">
+                  <img
+                    src={TESTIMONIALS[(activeTestimonialIdx + 1) % TESTIMONIALS.length].photoUrl}
+                    alt="Middle testimonial photo"
+                    className="w-full h-full object-cover grayscale-[40%] opacity-95"
+                  />
+                </div>
+                <div className="w-full h-[20%] flex items-center justify-center mt-1">
+                  <span className="font-handwriting text-[#380902]/85 text-2xl tracking-wide">
+                    {TESTIMONIALS[(activeTestimonialIdx + 1) % TESTIMONIALS.length].badge}
+                  </span>
+                </div>
+              </div>
+
+              {/* Main Front Card (Active Index) */}
+              <div 
+                className="absolute w-36 h-46 sm:w-40 sm:h-52 md:w-40 md:h-48 lg:w-48 lg:h-60 xl:w-56 xl:h-72 bg-white p-2 sm:p-3 pb-8 sm:pb-10 border border-white/10 shadow-[0_25px_55px_rgba(0,0,0,0.65)] rounded-sm transition-all duration-700 ease-out group cursor-pointer"
+                style={{
+                  zIndex: 20,
+                  transform: `scale(1) rotate(-3deg)`,
+                  opacity: 1,
+                }}
+              >
                 {/* Image Inside Polaroid */}
                 <div className="w-full h-[80%] overflow-hidden bg-stone-200 relative">
                   <div className="absolute inset-0 bg-stone-950/5 group-hover:bg-transparent transition-colors duration-300" />
@@ -1774,7 +1905,7 @@ export default function App() {
             </div>
 
             {/* 3. PARTITION: Vertical name line and rotated text exactly as in image */}
-            <div className="hidden md:flex items-center gap-3 lg:gap-6 h-36 lg:h-48 select-none px-1 lg:px-2 scale-85 lg:scale-90 xl:scale-100 shrink-0">
+            <div className="hidden md:flex items-center gap-2 lg:gap-4 h-36 lg:h-48 select-none px-1 scale-75 lg:scale-95">
               <div className="w-[1px] h-24 lg:h-32 bg-white/10" />
               <span className="font-bebas text-[#E0522E] text-base lg:text-xl tracking-[0.25em] [writing-mode:vertical-rl] select-none uppercase font-black whitespace-nowrap leading-none transform rotate-180">
                 {TESTIMONIALS[activeTestimonialIdx].name}
@@ -1791,11 +1922,11 @@ export default function App() {
             </div>
 
             {/* 4. RIGHT COLUMN: Testimonial review quote markup text with Highlight Underlines */}
-            <div className="w-full md:w-[32%] lg:w-[28%] flex flex-col items-center md:items-start text-center md:text-left md:pl-2 lg:pl-4 shrink-0">
+            <div className="scroll-test-right w-full md:w-[26%] lg:w-[24%] flex flex-col items-center md:items-start text-center md:text-left md:pl-4">
               
               {/* Highlight styled quote markup format */}
               <p
-                className="font-sans text-stone-200 text-sm sm:text-base md:text-xs lg:text-[14px] xl:text-[16px] font-normal leading-relaxed mb-6 md:mb-8 max-w-sm"
+                className="font-sans text-stone-200 text-sm sm:text-base md:text-xs lg:text-[14px] xl:text-[16px] font-normal leading-relaxed mb-6 md:mb-8 w-full max-w-[280px] sm:max-w-xs md:max-w-[240px] lg:max-w-[280px] xl:max-w-sm min-h-[150px] sm:min-h-[130px] md:min-h-[140px] lg:min-h-[120px] text-center md:text-left"
                 dangerouslySetInnerHTML={{ __html: TESTIMONIALS[activeTestimonialIdx].quoteHtml }}
               />
 
@@ -1824,6 +1955,168 @@ export default function App() {
         </div>
       </section>
 
+      {/* WHY CHOOSE US & WE ARE KNOWN SECTION - BEAUTIFUL CLEAN MINIMAL GRID */}
+      <section
+        id="why-choose-us"
+        className="relative w-full py-24 sm:py-32 bg-white text-stone-900 border-t border-stone-100"
+      >
+        <div className="max-w-7xl mx-auto px-6 relative">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            
+            {/* Left Column: The Feature Grid */}
+            <div className="lg:col-span-8 flex flex-col">
+              
+              {/* Elegant Section Header */}
+              <div className="scroll-why-header flex items-center gap-6 md:gap-8 mb-12 select-none">
+                <span className="font-sans text-xs sm:text-sm tracking-[0.25em] font-black text-[#C64A19] uppercase shrink-0 leading-none">
+                  WHY CHOOSE US?
+                </span>
+                <div className="w-[1px] h-10 bg-neutral-200 shrink-0" />
+                <h2 className="font-bebas text-4xl sm:text-5xl md:text-6xl tracking-tight leading-none text-stone-900 uppercase">
+                  WE ARE KNOWN
+                </h2>
+              </div>
+
+              {/* 3x2 Grid Container with detailed dividers */}
+              <div className="grid grid-cols-1 md:grid-cols-2 border-t border-b border-neutral-150 md:divide-x divide-neutral-150 divide-y md:divide-y-0">
+                
+                {/* Column 1 */}
+                <div className="flex flex-col divide-y divide-neutral-150">
+                  {/* Item 1 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M12 21c-4.418 0-8-3.134-8-7s3.582-7 8-7 8 3.134 8 7-3.582 7-8 7z" />
+                        <path d="M12 7c.5-1.5 2-2.5 3-2M12 7c-.5-1.5-2-2.5-3-2M12 7V4M12 4c.5-1 2-1 2-1M12 4c-.5-1-2-1-2-1" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">ALWAYS SERVE FRESH FOOD</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Perfectly portioned ingredients.</p>
+                    </div>
+                  </div>
+
+                  {/* Item 2 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M6 18c0-1.5 1-3.5 3-4C7 11.5 7.5 7 12 7c4.5 0 5 4.5 3 7 2 .5 3 2.5 3 4M5 18h14M6 21h12" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">WE HAVE POPULAR MASTERCHEF</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">The patient staff reflects the style.</p>
+                    </div>
+                  </div>
+
+                  {/* Item 3 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M20.5 4.5C20.5 4.5 12 6 8 10c-4 4-4.5 11.5-4.5 11.5s7.5-.5 11.5-4.5c4-4 5.5-12.5 5.5-12.5z" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="11" cy="11" r="1.5" fill="currentColor" />
+                        <circle cx="15" cy="8" r="1" fill="currentColor" />
+                        <circle cx="8" cy="15" r="1.5" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">DELICIOUS PIZZA RECIPES</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Best crust with this good recipe.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="flex flex-col divide-y divide-neutral-150">
+                  {/* Item 4 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">MAINTAINING THE QUALITY OF FOOD</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Standardized food recipes for uniform taste.</p>
+                    </div>
+                  </div>
+
+                  {/* Item 5 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M9 18V5l12-2v13M9 10l12-2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="6" cy="18" r="3" />
+                        <circle cx="18" cy="16" r="3" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">BEST LIVE MUSIC RESTAURANTS</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">Beautiful natural & serene ambience.</p>
+                    </div>
+                  </div>
+
+                  {/* Item 6 */}
+                  <div className="scroll-why-item flex items-start gap-6 py-10 px-4 sm:px-8 group hover:bg-neutral-50/50 transition-colors duration-305">
+                    <div className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-stone-50 text-[#8E1F0D] group-hover:scale-110 transition-transform duration-300">
+                      <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M21 16c0-4.418-4.03-8-9-8s-9 3.582-9 8h18zM12 4M12 4v4M10 4h4" strokeLinecap="round" />
+                        <path d="M2 19h20c0 1.105-.895 2-2 2H4c-1.105 0-2-.895-2-2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bebas text-2xl tracking-wide text-stone-900 leading-tight uppercase">WONDERFUL DINING EXPERIENCE</h3>
+                      <p className="font-sans text-sm text-stone-500 mt-1 leading-relaxed">A memorable dining atmosphere.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Floating Fresh ripe tomato visual side element with Scroll Bar as in image */}
+            <div className="lg:col-span-4 flex flex-row items-stretch justify-center relative min-h-[400px] select-none pl-4 overflow-visible">
+              
+              <div className="flex-1 flex flex-col items-center justify-center py-8 relative">
+                {/* Ripe tomato transparent image illustration float effect */}
+                <motion.div
+                  animate={{ y: [0, -12, 0], rotate: [0, 4, -2, 0] }}
+                  transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
+                  className="scroll-why-tomato relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center"
+                >
+                  <img
+                    src={PARLOR_TOMATO_IMAGE}
+                    alt="Glossy Italian Tomato"
+                    className="w-full h-full object-contain filter drop-shadow-[0_25px_45px_rgba(142,31,13,0.35)]"
+                  />
+                  {/* Absolute small helper labels around card */}
+                  <span className="absolute top-1/2 -left-6 tracking-[0.2em] text-[10px] font-mono text-stone-400 transform -rotate-90 uppercase">
+                    100% Organic
+                  </span>
+                  <span className="absolute bottom-6 right-6 tracking-[0.2em] text-[10px] font-mono text-stone-400 uppercase">
+                    Handmade
+                  </span>
+                </motion.div>
+              </div>
+
+              {/* Vertical line with vertical "SCROLL" and branding tag just like the image 2 right columns */}
+              <div className="w-16 flex flex-col items-center justify-between border-l border-neutral-100 py-6 scale-95 shrink-0 select-none">
+                <span className="font-sans text-[10px] font-black tracking-[0.3em] uppercase text-stone-400 rotate-90 my-12 whitespace-nowrap">
+                  SCROLL DOWN
+                </span>
+                <div className="w-[1.5px] h-24 bg-neutral-200" />
+                <div className="bg-[#380902] text-white py-4 px-2 tracking-[0.2em] font-sans font-black text-[9px] uppercase [writing-mode:vertical-rl] rounded-sm transform rotate-180 shadow-md">
+                  PIZZA CRAVE ORIGINALS
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
       {/* TWO PROMOTIONAL CARDS - MOST POPULAR PIZZA & FASTEST COURIER ASSETS */}
       <section className="relative w-full py-16 px-6 bg-[#FAF6F2] z-30 overflow-visible border-b border-neutral-100">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 overflow-visible">
@@ -1834,9 +2127,10 @@ export default function App() {
             {/* Hanging pizza cut-out image on the top right */}
             <div className="absolute right-[-45px] top-[-35px] w-64 h-64 sm:w-72 sm:h-72 select-none pointer-events-none transform group-hover:rotate-12 transition-transform duration-700 z-10">
               <img
-                src="https://pngimg.com/uploads/pizza/pizza_PNG44360.png"
-                alt="Bella Roma Sourdough Masterpiece"
-                className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.18)]"
+                src="/pizza-main.png"
+                alt="Pizza Crave Sourdough Masterpiece"
+                className="w-full h-full object-cover rounded-full filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.22)]"
+                style={{ clipPath: 'circle(50% at 50% 50%)' }}
               />
             </div>
 
@@ -1919,8 +2213,21 @@ export default function App() {
       </section>
 
       {/* FOOTER SECTION: LUXURY DARK MAROON CONTEXT WITH DRIVER ROAD TRACK */}
-      <footer className="relative bg-[#380902] text-white z-40 overflow-hidden border-t border-white/5 select-none text-center sm:text-left">
+      <footer className="relative bg-[#380902] text-white z-40 overflow-visible select-none text-center sm:text-left">
         
+        {/* Curved boundary for luxury wave look */}
+        <div className="absolute top-0 left-0 right-0 w-full overflow-hidden pointer-events-none select-none -translate-y-[99%]">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-[8vh] min-h-[50px]"
+            preserveAspectRatio="none"
+          >
+            <path d="M 0 120 C 480 0, 960 0, 1440 120 L 1440 120 L 0 120 Z" fill="#380902" />
+          </svg>
+        </div>
+
         {/* ACTIVE COURIER DELIVERY ROADWAY STRIP */}
         <div className="relative w-full bg-[#200501] border-b border-white/5 py-3 h-14 overflow-hidden flex items-center">
           {/* Custom Yellow Dashed Road Divider Lane */}
@@ -1950,7 +2257,7 @@ export default function App() {
               <rect x="5" y="25" width="18" height="18" rx="2" fill="#E0522E" stroke="currentColor" strokeWidth="3" />
             </svg>
             <div className="flex flex-col text-left">
-              <span className="text-[9px] font-sans font-black tracking-widest text-[#FFBC00] uppercase leading-none">Bella Roma</span>
+              <span className="text-[9px] font-sans font-black tracking-widest text-[#FFBC00] uppercase leading-none">Pizza Crave</span>
               <span className="text-[7px] font-mono text-zinc-400 uppercase leading-none mt-0.5">Rapid Delivery Road...</span>
             </div>
           </motion.div>
@@ -1959,20 +2266,47 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 pt-16 pb-12 relative z-10">
           
           {/* HOME DELIVERY EXPERIENCE BANNER TITLE (Matching Image 2 banner) */}
-          <div className="text-center pb-14 border-b border-light border-white/5 mb-14">
-            <h2 className="font-bebas text-4xl sm:text-5xl md:text-6xl lg:text-[66px] tracking-tight text-white uppercase leading-none">
-              UNFORGETTABLE HOME DELIVERY EXPERIENCE{" "}
-              <a href="tel:+12345678910" className="underline decoration-[#FFBC00] decoration-3 underline-offset-8 hover:text-[#FFBC00] transition-colors whitespace-nowrap">
-                +1 234 567 8910
-              </a>
+          <div className="text-center pb-10 mb-10">
+            <h2 className="font-bebas text-4xl sm:text-5xl md:text-6xl lg:text-[66px] tracking-tight text-white uppercase leading-none flex flex-col sm:flex-row items-center justify-center gap-3">
+              <span>UNFORGETTABLE HOME DELIVERY EXPERIENCE</span>{" "}
+              <span className="inline-flex items-center gap-4 whitespace-nowrap">
+                <a href="tel:+12345678910" className="underline decoration-[#FFBC00] decoration-3 underline-offset-8 hover:text-[#FFBC00] transition-colors relative group pl-5">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-[#FFBC00] rounded-full animate-ping" />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-[#FFBC00] rounded-full" />
+                  +1 234 567 8910
+                </a>
+              </span>
             </h2>
           </div>
 
-          {/* MAIN FOOTER CONTENTS COLUMNS: 4 COLUMN GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-8 items-start mb-16 text-center sm:text-left text-stone-300">
+          {/* NEWSLETTER SUBSCRIBE GRID BANNER */}
+          <div className="relative z-10 w-full bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-[28px] p-8 sm:p-10 mb-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="max-w-md text-left">
+              <span className="font-sans text-[10px] tracking-[0.2em] font-black text-[#FFBC00] uppercase mb-2 block">CRAVE LAB CLUB</span>
+              <h3 className="font-bebas text-2xl sm:text-3xl text-white tracking-wide uppercase leading-none mb-2">Subscribe to our Secret Recipes</h3>
+              <p className="font-sans text-xs text-stone-400">Join our newsletter to receive exclusive recipes, culinary updates, and special tasting invitations.</p>
+            </div>
+            <form onSubmit={(e) => e.preventDefault()} className="flex items-center w-full md:max-w-md bg-white/5 rounded-full p-1.5 border border-white/15 focus-within:border-[#FFBC00]/60 focus-within:ring-1 focus-within:ring-[#FFBC00]/30 transition-all duration-300">
+              <input
+                type="email"
+                placeholder="Enter your email address..."
+                className="flex-1 bg-transparent border-0 outline-none px-4 py-2 text-sm text-white placeholder-stone-500 font-sans"
+                required
+              />
+              <button
+                type="submit"
+                className="bg-[#FFBC00] hover:bg-white text-[#380902] font-sans font-black text-xs tracking-widest uppercase px-6 py-3 rounded-full transition-all duration-300 transform active:scale-95 cursor-pointer flex items-center gap-1"
+              >
+                Join Now <span className="font-mono">→</span>
+              </button>
+            </form>
+          </div>
+
+          {/* MAIN FOOTER CONTENTS COLUMNS: 5 COLUMN GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 sm:gap-8 items-start mb-16 text-center sm:text-left text-stone-300">
             
             {/* Column 1: Custom logo with rotating cutlery icon */}
-            <div className="flex flex-col items-center sm:items-start text-left">
+            <div className="flex flex-col items-center sm:items-start text-left col-span-1 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-3 mb-4 self-center sm:self-start">
                 <div className="bg-white text-[#380902] p-2.5 rounded-full flex items-center justify-center shadow-lg">
                   <svg className="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2">
@@ -1980,8 +2314,8 @@ export default function App() {
                   </svg>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bebas text-2xl tracking-[0.1em] text-white leading-none uppercase">BELLA ROMA</span>
-                  <span className="font-sans font-medium text-[9px] tracking-widest text-amber-300 uppercase mt-0.5">DAL 1984 RISTORANTE</span>
+                  <span className="font-bebas text-2xl tracking-[0.1em] text-white leading-none uppercase">PIZZA CRAVE</span>
+                  <span className="font-sans font-medium text-[9px] tracking-widest text-amber-300 uppercase mt-0.5">Gourmet Neapolitan</span>
                 </div>
               </div>
               <p className="font-sans text-xs leading-relaxed max-w-xs text-center sm:text-left">
@@ -1989,7 +2323,29 @@ export default function App() {
               </p>
             </div>
 
-            {/* Column 2: Find our restaurants address */}
+            {/* Column 2: Quick Links */}
+            <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+              <h4 className="font-bebas text-xl tracking-wider text-white uppercase mb-4 font-bold">Quick Links</h4>
+              <ul className="font-sans text-xs space-y-2.5 text-stone-400">
+                <li>
+                  <a href="#hero-section" className="hover:text-amber-300 transition-colors uppercase tracking-wider font-semibold">Masterpiece</a>
+                </li>
+                <li>
+                  <a href="#signature-pizza-section" className="hover:text-amber-300 transition-colors uppercase tracking-wider font-semibold">Popular Pizzas</a>
+                </li>
+                <li>
+                  <a href="#all-flavors-section" className="hover:text-amber-300 transition-colors uppercase tracking-wider font-semibold">All Flavors</a>
+                </li>
+                <li>
+                  <a href="#why-choose-us" className="hover:text-amber-300 transition-colors uppercase tracking-wider font-semibold">Why Choose Us</a>
+                </li>
+                <li>
+                  <a href="#testimonials-section" className="hover:text-amber-300 transition-colors uppercase tracking-wider font-semibold">Customer Reviews</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Find our restaurants address */}
             <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
               <h4 className="font-bebas text-xl tracking-wider text-white uppercase mb-4 font-bold">Find our restaurants</h4>
               <p className="font-sans text-xs leading-relaxed max-w-xs">
@@ -2001,7 +2357,7 @@ export default function App() {
               </p>
             </div>
 
-            {/* Column 3: Opening hours */}
+            {/* Column 4: Opening hours */}
             <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
               <h4 className="font-bebas text-xl tracking-wider text-white uppercase mb-4 font-bold">Opening hours</h4>
               <p className="font-sans text-xs leading-relaxed max-w-xs">
@@ -2013,13 +2369,13 @@ export default function App() {
               </p>
             </div>
 
-            {/* Column 4: Content integrations connect buttons */}
+            {/* Column 5: Content integrations connect buttons */}
             <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
               <h4 className="font-bebas text-xl tracking-wider text-white uppercase mb-4 font-bold">Connect with us</h4>
               <div className="flex items-center gap-3 shrink-0">
                 <a
                   href="#social-fb"
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-white text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-300 cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-[#FFBC00] text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 hover:shadow-[0_0_15px_rgba(255,188,0,0.5)] active:scale-95"
                   aria-label="Facebook Link"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2028,7 +2384,7 @@ export default function App() {
                 </a>
                 <a
                   href="#social-ig"
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-white text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-300 cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-[#FFBC00] text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 hover:shadow-[0_0_15px_rgba(255,188,0,0.5)] active:scale-95"
                   aria-label="Instagram Link"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2037,7 +2393,7 @@ export default function App() {
                 </a>
                 <a
                   href="#social-x"
-                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-white text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-300 cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-[#FFBC00] text-white hover:text-[#380902] border border-white/10 flex items-center justify-center transition-all duration-500 cursor-pointer hover:scale-110 hover:shadow-[0_0_15px_rgba(255,188,0,0.5)] active:scale-95"
                   aria-label="Twitter Link"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -2046,9 +2402,9 @@ export default function App() {
                 </a>
               </div>
             </div>
-
+ 
           </div>
-
+ 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 pt-8 text-stone-400 font-sans text-[11px] uppercase tracking-wider">
             <span>Award-Winning Food Design Lab © 2026</span>
             <div className="flex items-center gap-6">
@@ -2064,7 +2420,7 @@ export default function App() {
               </button>
             </div>
           </div>
-
+ 
         </div>
       </footer>
     </div>
